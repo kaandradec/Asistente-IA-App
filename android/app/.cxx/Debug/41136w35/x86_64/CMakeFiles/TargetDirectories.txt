@@ -1,0 +1,2 @@
+C:/Users/Alvaro/Documents/workspace/mobile/flutter/niaje/android/app/.cxx/Debug/41136w35/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Alvaro/Documents/workspace/mobile/flutter/niaje/android/app/.cxx/Debug/41136w35/x86_64/CMakeFiles/rebuild_cache.dir
