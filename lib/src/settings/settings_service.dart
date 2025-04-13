@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:niaje/util/shared_preference.dart';
+import 'package:al_ia/util/shared_preference.dart';
 
 /// A service that stores and retrieves user settings.
 ///

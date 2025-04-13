@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:niaje/src/history/history_view.dart';
-import 'package:niaje/src/home/home_view.dart';
-import 'package:niaje/themes/dark.dart';
-import 'package:niaje/themes/light.dart';
+import 'package:al_ia/src/history/history_view.dart';
+import 'package:al_ia/src/home/home_view.dart';
+import 'package:al_ia/themes/dark.dart';
+import 'package:al_ia/themes/light.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 

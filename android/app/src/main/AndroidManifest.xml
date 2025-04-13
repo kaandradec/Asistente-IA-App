@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="co.ke.martin.niaje">
    <application
-        android:label="Niaje"
+        android:label="AL.ia"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

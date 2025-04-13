@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:niaje/src/history/history_view.dart';
-import 'package:niaje/src/settings/settings_view.dart';
-import 'package:niaje/widgets/background_wave.dart';
+import 'package:al_ia/src/history/history_view.dart';
+import 'package:al_ia/src/settings/settings_view.dart';
+import 'package:al_ia/widgets/background_wave.dart';
 
 class SliverCustomAppBar extends SliverPersistentHeaderDelegate {
   const SliverCustomAppBar();
@@ -31,7 +31,7 @@ class SliverCustomAppBar extends SliverPersistentHeaderDelegate {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Niaje",
+                    "AL.ia",
                     style: TextStyle(
                       color: Colors.white70,
                       fontWeight: FontWeight.bold,
@@ -40,7 +40,7 @@ class SliverCustomAppBar extends SliverPersistentHeaderDelegate {
                   ),
                   SizedBox(height: 6.0),
                   Text(
-                    "Your AI voice assistant",
+                    "Tu asistente de voz con IA",
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w200,

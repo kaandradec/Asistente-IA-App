@@ -1,0 +1,2 @@
+C:/Users/Alvaro/Documents/workspace/mobile/flutter/niaje/android/app/.cxx/RelWithDebInfo/d102f4e4/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/Alvaro/Documents/workspace/mobile/flutter/niaje/android/app/.cxx/RelWithDebInfo/d102f4e4/arm64-v8a/CMakeFiles/rebuild_cache.dir

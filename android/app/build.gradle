@@ -8,7 +8,7 @@ def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)í
+        localProperties.load(reader)
     }
 }
 
@@ -48,7 +48,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "co.ke.martin.niaje"
+        applicationId "co.ke.martin.al_ia"
         minSdkVersion localProperties.getProperty('flutter.minSdkVersion').toInteger()
         targetSdkVersion localProperties.getProperty('flutter.targetSdkVersion').toInteger()
         versionCode flutterVersionCode.toInteger()

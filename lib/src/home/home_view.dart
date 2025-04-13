@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:avatar_glow/avatar_glow.dart';
@@ -5,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:niaje/api/speech_api.dart';
-import 'package:niaje/src/settings/settings_controller.dart';
-import 'package:niaje/widgets/sliver_custom_app_bar.dart';
-import 'package:niaje/util/common.dart';
+import 'package:al_ia/api/speech_api.dart';
+import 'package:al_ia/src/home/models.dart';
+import 'package:al_ia/src/settings/settings_controller.dart';
+import 'package:al_ia/widgets/sliver_custom_app_bar.dart';
+import 'package:al_ia/util/common.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:lottie/lottie.dart';
 
 class HomeView extends StatefulWidget {
   final SettingsController controller;
@@ -25,14 +28,18 @@ class HomeView extends StatefulWidget {
 
 enum TtsState { playing, stopped, paused, continued }
 
-class HomeViewState extends State<HomeView> {
-  final String defaultStr = 'Tap the mic & say something...';
+class HomeViewState extends State<HomeView> with TickerProviderStateMixin {
+  final String defaultStr = 'Presione el micrófono y di algo...';
   late String text;
+  final List<Content> chatHistory = []; //ADDED
   late bool cleared;
   bool isListening = false;
   bool fetchingResponse = false;
   String responseStr = '';
-  bool currentlyPlaying = false;
+  bool currentlyPlaying = false; //La voz esta hablando true/false
+  late final AnimationController _lottieController;
+
+  final ValueNotifier<bool> isPlayingNotifier = ValueNotifier<bool>(false);
 
   late FlutterTts flutterTts;
   String? language;
@@ -60,17 +67,65 @@ class HomeViewState extends State<HomeView> {
 
   @override
   void initState() {
+    _inicializarAnimaciones();
+
     cleared = true;
     text = defaultStr;
     initTts();
     handlePresets();
+    _initializeChat(); //ADDED
+
+    isPlayingNotifier.addListener(_onPlayingStateChanged);
     super.initState();
+  }
+
+  void _onPlayingStateChanged() {
+    // Se ejecuta cada vez que el valor cambia
+    if (isPlayingNotifier.value) {
+      _lottieController.reset(); // Volver al inicio
+      _lottieController.repeat(
+        // Repetir la animación
+        reverse: true, // Ir y volver (efecto boca)
+        period: const Duration(seconds: 1), // Duración de cada ciclo
+      );
+    } else {
+      _lottieController.animateTo(0.4);
+    }
   }
 
   @override
   void dispose() {
     flutterTts.stop();
+    _lottieController.dispose();
     super.dispose();
+  }
+
+  _inicializarAnimaciones() {
+    _lottieController = AnimationController(
+      value: 0.4,
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    );
+  }
+
+  //ADDED
+  Future<void> _initializeChat() async {
+    // Contexto inicial
+    chatHistory.add(
+      Content(
+        role: 'user',
+        parts: [
+          Part.text("""
+          Eres un asistente amigable que:
+          0. Tus creadores son $elian $jordan $solange y $carolina
+          1. Da respuestas concisas y claras
+          3. Usa un tono amable y profesional
+          4. Si no sabes algo, lo admites honestamente
+          5. Esta app fue hecha para exponerla a un público y mostrarles las capacidades de la tecnología actual
+          """)
+        ],
+      ),
+    );
   }
 
   @override
@@ -92,6 +147,18 @@ class HomeViewState extends State<HomeView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // const SizedBox(height: 8.0),
+                      Center(
+                        child: Lottie.asset(
+                          'assets/boca_lottie.json', // tu archivo de animación
+                          width: 100,
+                          height: 100,
+                          controller: _lottieController,
+                          onLoaded: (composition) {
+                            _lottieController.duration = composition.duration;
+                          },
+                        ),
+                      ),
                       Text(
                         text.toCapitalized(),
                         style: const TextStyle(
@@ -101,8 +168,9 @@ class HomeViewState extends State<HomeView> {
                       const SizedBox(height: 10.0),
                       !isListening && !cleared && !fetchingResponse
                           ? InkWell(
+                              onTap: _clearChat,
                               child: const Text(
-                                "Clear \u2573",
+                                "Borrar \u2573",
                                 style: TextStyle(
                                   color: Colors.transparent,
                                   decoration: TextDecoration.underline,
@@ -115,13 +183,13 @@ class HomeViewState extends State<HomeView> {
                                   ],
                                 ),
                               ),
-                              onTap: () async {
-                                await _stop();
-                                text = defaultStr;
-                                cleared = true;
-                                responseStr = '';
-                                setState(() {});
-                              },
+                              // onTap: () async {
+                              //   await _stop();
+                              //   text = defaultStr;
+                              //   cleared = true;
+                              //   responseStr = '';
+                              //   setState(() {});
+                              // },
                             )
                           : const SizedBox(),
                       const SizedBox(height: 40.0),
@@ -205,7 +273,7 @@ class HomeViewState extends State<HomeView> {
           setState(() {});
 
           if (!isListening) {
-            Future.delayed(const Duration(seconds: 1), () async {
+            Future.delayed(const Duration(seconds: 3), () async {
               logger.i(text);
               // Make request to ChatGPT here, and read out loud API response
               await geminiSearch(text);
@@ -230,22 +298,59 @@ class HomeViewState extends State<HomeView> {
     }
   }
 
+  //CHANGED
   Future geminiSearch(String q) async {
     fetchingResponse = true;
     setState(() {});
-    gemini.prompt(parts: [Part.text(q)]).then((value) async {
-      logger.e(value?.output);
-      // logger.e(value?.content?.parts?.last.text);
-      responseStr = (value?.output ?? '').replaceAll('*', '');
-      setState(() {});
-      await _appHistory(q.toCapitalized());
-      _speak(msg: responseStr);
+
+    try {
+      // Agregar la pregunta del usuario al historial
+      chatHistory.add(
+        Content(
+          role: 'user',
+          parts: [Part.text(q)],
+        ),
+      );
+
+      final response = await gemini.chat(chatHistory);
+
+      if (response?.output != null) {
+        responseStr = (response?.output ?? '').replaceAll('*', '');
+
+        // Agregar la respuesta al historial
+        chatHistory.add(
+          Content(
+            role: 'model',
+            parts: [Part.text(responseStr)],
+          ),
+        );
+
+        // Primero actualizamos el estado para mostrar el texto
+        fetchingResponse = false;
+        setState(() {});
+
+        // Luego guardamos en el historial
+        await _appHistory(q.toCapitalized());
+
+        // Finalmente iniciamos el texto a voz sin await
+        _speak(msg: responseStr);
+      }
+    } catch (e) {
+      logger.e(e);
       fetchingResponse = false;
       setState(() {});
-    }).catchError((e) {
-      fetchingResponse = false;
-      setState(() {});
-    });
+    }
+  }
+
+  Future<void> _clearChat() async {
+    // Added
+    await _stop();
+    text = defaultStr;
+    cleared = true;
+    responseStr = '';
+    chatHistory.clear(); // Limpiar el historial
+    await _initializeChat(); // Reiniciar el contexto
+    setState(() {});
   }
 
   AnimatedTextKit aiText() {
@@ -265,6 +370,7 @@ class HomeViewState extends State<HomeView> {
 
   initTts() {
     flutterTts = FlutterTts();
+    flutterTts.setLanguage("es-MX"); // CHANGED
 
     _setAwaitOptions();
 
@@ -277,6 +383,7 @@ class HomeViewState extends State<HomeView> {
       setState(() {
         logger.d("Playing");
         currentlyPlaying = true;
+        isPlayingNotifier.value = true; // REPEAT LOTTIE ANIMATION
         ttsState = TtsState.playing;
       });
     });
@@ -285,6 +392,7 @@ class HomeViewState extends State<HomeView> {
       setState(() {
         logger.d("Complete");
         currentlyPlaying = false;
+        isPlayingNotifier.value = false; // STOP LOTTIE ANIMATION
         ttsState = TtsState.stopped;
       });
     });
@@ -369,14 +477,16 @@ class HomeViewState extends State<HomeView> {
   }
 
   Future _speak({String msg = ''}) async {
-    await flutterTts.setVolume(volume);
-    await flutterTts.setSpeechRate(rate);
-    await flutterTts.setPitch(pitch);
-
     if (msg.isNotEmpty) {
-      currentlyPlaying = true;
-      setState(() {});
-      await flutterTts.speak(msg);
+      await flutterTts.setVolume(volume);
+      await flutterTts.setSpeechRate(rate);
+      await flutterTts.setPitch(pitch);
+
+      setState(() {
+        currentlyPlaying = true;
+      });
+
+      flutterTts.speak(msg); // Removido el await
     }
   }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:niaje/util/common.dart';
+import 'package:al_ia/util/common.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class SpeechApi {
@@ -20,7 +20,7 @@ class SpeechApi {
 
     if (isAvailable) {
       speech.listen(
-          // localeId: 'es-MX',
+          localeId: 'es-MX',
           onResult: (value) => onResult(value.recognizedWords));
     }
 

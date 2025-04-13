@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:niaje/util/common.dart';
+import 'package:al_ia/util/common.dart';
 import 'settings_controller.dart';
 
 class SettingsView extends StatefulWidget {
@@ -15,7 +15,7 @@ class SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text('Configuración'),
       ),
       body: SizedBox.expand(
         child: Column(
@@ -35,7 +35,7 @@ class SettingsViewState extends State<SettingsView> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "System theme",
+                        "Tema",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                         ),
@@ -49,7 +49,7 @@ class SettingsViewState extends State<SettingsView> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "Light theme",
+                        "Tema Claro",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                         ),
@@ -63,7 +63,7 @@ class SettingsViewState extends State<SettingsView> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "Dark theme",
+                        "Tema Obscuro",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                         ),
@@ -74,7 +74,7 @@ class SettingsViewState extends State<SettingsView> {
               ],
               child: ListTile(
                 title: const Text(
-                  "Theme",
+                  "Tema",
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                   ),
